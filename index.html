@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)https://wspgm-81-69-10-105.free.pinggy.net/ -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>你有多了解我？（网页预览版）</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif;
+    background: linear-gradient(165deg, #6a5acd 0%, #8a7fff 38%, #ff9ec4 100%);
+    background-attachment: fixed;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  #app {
+    width: 100%;
+    max-width: 480px;
+    padding: 40px 22px 60px;
+  }
+  .screen { display: none; }
+  .screen.active { display: block; animation: fade .35s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* 通用按钮 */
+  button { border: none; font-family: inherit; cursor: pointer; }
+  button:active { transform: scale(.97); }
+
+  /* 开始页 */
+  .hero { text-align: center; color: #fff; margin-top: 50px; }
+  .emoji { font-size: 90px; line-height: 1; }
+  .title { font-size: 34px; font-weight: 700; margin-top: 18px; letter-spacing: 1px; }
+  .subtitle { font-size: 15px; margin-top: 12px; opacity: .92; line-height: 1.6; }
+  .card {
+    margin: 44px 4px 0; background: rgba(255,255,255,.96); border-radius: 20px;
+    padding: 22px 24px; box-shadow: 0 16px 40px rgba(80,60,160,.25);
+  }
+  .card-line { display: flex; align-items: center; font-size: 15px; color: #444; padding: 9px 0; border-bottom: 1px solid #f0f0f0; }
+  .card-line:last-child { border-bottom: none; }
+  .ic { width: 28px; font-size: 18px; }
+  .btn-start {
+    margin-top: 44px; width: 100%; background: #fff; color: #6a5acd;
+    font-size: 18px; font-weight: 700; border-radius: 30px; padding: 16px 0;
+    box-shadow: 0 12px 30px rgba(0,0,0,.15);
+  }
+  .tip { text-align: center; color: rgba(255,255,255,.9); font-size: 12px; margin-top: 26px; }
+
+  /* 答题页 */
+  .progress-wrap { color: #fff; margin-bottom: 20px; }
+  .progress-text { font-size: 14px; margin-bottom: 8px; opacity: .95; }
+  .progress-bar { height: 8px; background: rgba(255,255,255,.35); border-radius: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #fff; border-radius: 10px; transition: width .3s ease; width: 0; }
+  .q-card {
+    background: #fff; border-radius: 20px; padding: 26px 22px 30px;
+    box-shadow: 0 16px 40px rgba(80,60,160,.25);
+  }
+  .q-head { display: flex; align-items: center; }
+  .q-index { display: inline-block; background: #6a5acd; color: #fff; font-size: 13px; font-weight: 700; padding: 3px 12px; border-radius: 30px; }
+  .multi-badge { margin-left: 8px; background: #ff9ec4; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 30px; }
+  .q-title { font-size: 20px; font-weight: 600; color: #222; margin-top: 14px; line-height: 1.5; }
+  .multi-tip { font-size: 12px; color: #b06ab3; margin-top: 8px; }
+  .options { margin-top: 20px; }
+  .option {
+    display: flex; align-items: center; border: 2px solid #e6e1f5; border-radius: 14px;
+    padding: 16px 16px; margin-bottom: 12px; transition: all .15s ease; background: #fff;
+  }
+  .option:active { background: #f3f0ff; }
+  .option.selected { border-color: #6a5acd; background: #f3f0ff; box-shadow: 0 6px 18px rgba(106,90,205,.2); }
+  .option-label {
+    width: 30px; height: 30px; line-height: 30px; text-align: center; border-radius: 50%;
+    background: #efeafc; color: #6a5acd; font-weight: 700; font-size: 14px; margin-right: 14px; flex-shrink: 0;
+  }
+  .option.selected .option-label { background: #6a5acd; color: #fff; }
+  .option-text { font-size: 16px; color: #333; flex: 1; }
+  .check { margin-left: 10px; color: #6a5acd; font-weight: 700; font-size: 18px; }
+  .btn-row { display: flex; gap: 12px; margin-top: 28px; }
+  .btn-prev { flex: 0 0 96px; background: rgba(255,255,255,.9); color: #6a5acd; font-size: 15px; border-radius: 30px; padding: 14px 0; }
+  .btn-next { flex: 1; background: #fff; color: #6a5acd; font-size: 16px; font-weight: 700; border-radius: 30px; padding: 14px 0; box-shadow: 0 12px 30px rgba(0,0,0,.15); }
+
+  /* 结果页 */
+  .score-card { background: rgba(255,255,255,.96); border-radius: 22px; padding: 40px 24px 32px; text-align: center; box-shadow: 0 16px 40px rgba(80,60,160,.25); }
+  .score-circle {
+    width: 160px; height: 160px; margin: 0 auto; border-radius: 50%;
+    background: conic-gradient(#6a5acd 0%, #8a7fff var(--p,0%), #eee var(--p,0%));
+    display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
+  }
+  .score-circle::after { content: ''; position: absolute; width: 130px; height: 130px; border-radius: 50%; background: #fff; }
+  .percent { position: relative; z-index: 1; font-size: 42px; font-weight: 800; color: #6a5acd; line-height: 1; }
+  .score-sub { position: relative; z-index: 1; font-size: 13px; color: #888; margin-top: 6px; }
+  .rating { margin-top: 24px; font-size: 18px; font-weight: 600; color: #333; line-height: 1.5; }
+  .detail-title { color: #fff; font-size: 16px; font-weight: 700; margin: 34px 4px 14px; }
+  .detail-item { background: #fff; border-radius: 14px; padding: 18px 18px; margin-bottom: 12px; box-shadow: 0 8px 22px rgba(80,60,160,.18); }
+  .detail-q { display: flex; align-items: flex-start; }
+  .q-no { color: #6a5acd; font-weight: 700; font-size: 15px; margin-right: 6px; flex-shrink: 0; }
+  .q-text { font-size: 15px; font-weight: 600; color: #222; line-height: 1.45; }
+  .detail-row { margin: 12px 0 4px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 12px; border-radius: 30px; }
+  .tag-right { background: #e6f9ed; color: #1aab5b; }
+  .tag-wrong { background: #ffeaea; color: #e74c3c; }
+  .answer-line { font-size: 14px; color: #666; margin-top: 5px; line-height: 1.4; }
+  .answer-correct { color: #1aab5b; font-weight: 600; }
+  .btn-home { margin-top: 34px; width: 100%; background: #fff; color: #6a5acd; font-size: 17px; font-weight: 700; border-radius: 30px; padding: 15px 0; box-shadow: 0 12px 30px rgba(0,0,0,.15); }
+  .preview-note { text-align: center; color: rgba(255,255,255,.85); font-size: 12px; margin-top: 22px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- 开始页 -->
+  <section id="start" class="screen active">
+    <div class="hero">
+      <div class="emoji">🤔</div>
+      <div class="title">你有多了解我？</div>
+      <div class="subtitle">一套 15 道题的小测试<br>看看你对我到底了解多少</div>
+    </div>
+    <div class="card">
+      <div class="card-line"><span class="ic">📝</span> 共 15 道选择题</div>
+      <div class="card-line"><span class="ic">⏱</span> 大约 2 分钟搞定</div>
+      <div class="card-line"><span class="ic">🎯</span> 答完立刻公布正确率 &amp; 答案</div>
+    </div>
+    <button class="btn-start" onclick="startQuiz()">开始测试 →</button>
+    <div class="tip">凭直觉选，别作弊翻聊天记录哦 😏</div>
+  </section>
+
+  <!-- 答题页 -->
+  <section id="quiz" class="screen">
+    <div class="progress-wrap">
+      <div class="progress-text" id="progressText"></div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <div class="q-card">
+      <div class="q-head">
+        <span class="q-index" id="qIndex"></span>
+        <span class="multi-badge" id="multiBadge" style="display:none">多选</span>
+      </div>
+      <div class="q-title" id="qTitle"></div>
+      <div class="multi-tip" id="multiTip" style="display:none">（本题可多选，需全部选对才算答对）</div>
+      <div class="options" id="options"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-prev" id="btnPrev" style="display:none" onclick="prev()">上一题</button>
+      <button class="btn-next" id="btnNext" onclick="next()">下一题 →</button>
+    </div>
+  </section>
+
+  <!-- 结果页 -->
+  <section id="result" class="screen">
+    <div class="score-card">
+      <div class="score-circle" id="scoreCircle">
+        <span class="percent" id="percent">0%</span>
+        <span class="score-sub" id="scoreSub"></span>
+      </div>
+      <div class="rating" id="rating"></div>
+    </div>
+    <div class="detail-title">📋 各题答案</div>
+    <div id="detailList"></div>
+    <button class="btn-home" onclick="restart()">再测一次</button>
+    <div class="preview-note">网页预览版 · 与微信小程序同题同判分逻辑</div>
+  </section>
+
+</div>
+
+<script>
+/* ===== 题目数据（与小程序 data/questions.js 一致，已含正确答案） ===== */
+const QUESTIONS = [
+  { title:'穿衣服最害怕露哪个部位？', options:['手臂','大腿','小腿','肚/腰','低胸'], answer:2 },
+  { title:'我最喜欢看以下哪种文学？', options:['国内外名著','外国文学小说','恐怖小说','散文','哲学'], answer:1 },
+  { title:'我最喜欢以下哪种类型的电影？', options:['爱情','科幻','喜剧','动画','文艺','纪实','悬疑'], answer:5 },
+  { title:'我出门一定会带哪种物品（双选题）', options:['纸巾','包包','耳机','香水','粉饼','口红','镜子'], multi:true, answer:[2,5] },
+  { title:'我不吃哪些东西？（三选题）', options:['椰奶','鸡蛋','羊肉','田鸡','黄鳝','鸭肉','马肉'], multi:true, answer:[0,3,4] },
+  { title:'我的大学专业是哪个？', options:['建筑学','城市规划','室内设计','国际金融','国际物流'], answer:1 },
+  { title:'我的猫是从何而来？', options:['路上捡到','朋友送的','宠物店购买','领养'], answer:1 },
+  { title:'我最喜欢的甜品蛋糕是哪款？', options:['纽约芝士','巴斯克','甜甜圈','铜锣烧','布朗尼'], answer:0 },
+  { title:'我最不喜欢什么颜色的衣服？', options:['粉色','美拉德色系','天蓝色','祖母绿','新年红'], answer:2 },
+  { title:'我在化妆的时候认为不可或缺的是？', options:['睫毛膏','高光','阴影','眼影','腮红'], answer:4 },
+  { title:'我没有去过以下哪个地方？', options:['安徽','湖北','山东','黑龙江','河南'], answer:0 },
+  { title:'我最接受不了哪种关系？', options:['姐弟恋','跨国恋','师生恋','师徒恋','忘年恋'], answer:2 },
+  { title:'我没有过以下哪一代iphone？', options:['iphone4','iphone6','iphone8','iphone12','iphone14'], answer:3 },
+  { title:'我平时用哪个AI比较多', options:['豆包','deepseek','chatgpt','元宝','claude'], answer:1 },
+  { title:'我对以下购物软件的使用频率从多到少的排序是？', options:['抖音＞淘宝＞京东','京东＞淘宝＞抖音','淘宝＞抖音＞京东','抖音＞京东＞淘宝','京东＞抖音＞淘宝','淘宝＞京东＞淘宝'], answer:3 }
+];
+const LABELS = ['A','B','C','D','E','F','G'];
+
+/* ===== 状态 ===== */
+let current = 0;
+let answers = [];   // 单选: 数字(-1未答) / 多选: 数组
+
+function initAnswers(){
+  answers = QUESTIONS.map(q => q.multi ? [] : -1);
+}
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ===== 开始 / 重来 ===== */
+function startQuiz(){
+  current = 0;
+  initAnswers();
+  show('quiz');
+  renderQuestion();
+}
+function restart(){
+  show('start');
+}
+
+/* ===== 渲染题目 ===== */
+function renderQuestion(){
+  const q = QUESTIONS[current];
+  const total = QUESTIONS.length;
+
+  document.getElementById('progressText').textContent = `第 ${current+1} / ${total} 题`;
+  document.getElementById('progressFill').style.width = ((current+1)/total*100) + '%';
+  document.getElementById('qIndex').textContent = 'Q' + (current+1);
+
+  const isMulti = !!q.multi;
+  document.getElementById('multiBadge').style.display = isMulti ? 'inline-block' : 'none';
+  document.getElementById('multiTip').style.display = isMulti ? 'block' : 'none';
+  document.getElementById('qTitle').textContent = q.title;
+
+  // 选项
+  const sel = answers[current];
+  const box = document.getElementById('options');
+  box.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    let isSel = isMulti ? (sel.indexOf(i) > -1) : (sel === i);
+    const div = document.createElement('div');
+    div.className = 'option' + (isSel ? ' selected' : '');
+    div.onclick = () => selectOption(i);
+    div.innerHTML = `<span class="option-label">${LABELS[i]}</span>` +
+                    `<span class="option-text">${opt}</span>` +
+                    (isSel ? `<span class="check">✓</span>` : '');
+    box.appendChild(div);
+  });
+
+  // 按钮
+  document.getElementById('btnPrev').style.display = current > 0 ? 'block' : 'none';
+  document.getElementById('btnNext').textContent = current === total-1 ? '查看结果 🎉' : '下一题 →';
+}
+
+/* ===== 选择 ===== */
+function selectOption(i){
+  const q = QUESTIONS[current];
+  if (q.multi){
+    const arr = answers[current];
+    const pos = arr.indexOf(i);
+    if (pos > -1) arr.splice(pos,1); else arr.push(i);
+    answers[current] = arr;
+  } else {
+    answers[current] = i;
+  }
+  renderQuestion();
+}
+
+/* ===== 上一题 / 下一题 ===== */
+function prev(){
+  if (current > 0){ current--; renderQuestion(); }
+}
+function next(){
+  const q = QUESTIONS[current];
+  const sel = answers[current];
+  const empty = q.multi ? (sel.length === 0) : (sel === -1);
+  if (empty){ alert('请先选择答案哦'); return; }
+  if (current < QUESTIONS.length - 1){
+    current++; renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+/* ===== 结果 ===== */
+function showResult(){
+  const total = QUESTIONS.length;
+  let correct = 0;
+  const detail = QUESTIONS.map((q, i) => {
+    const your = answers[i];
+    let isCorrect;
+    if (q.multi){
+      const a = q.answer.slice().sort();
+      const y = your.slice().sort();
+      isCorrect = a.length === y.length && a.every((v,k) => v === y[k]);
+    } else {
+      isCorrect = your === q.answer;
+    }
+    if (isCorrect) correct++;
+    const fmt = (arr) => arr.map(idx => q.options[idx]).join('、');
+    const yourText = q.multi ? (your.length ? fmt(your) : '（未作答）') : (your >= 0 ? q.options[your] : '（未作答）');
+    const correctText = q.multi ? fmt(q.answer) : q.options[q.answer];
+    return { title:q.title, yourAnswer:yourText, correctAnswer:correctText, isCorrect };
+  });
+
+  const percent = Math.round(correct/total*100);
+  document.getElementById('percent').textContent = percent + '%';
+  document.getElementById('scoreCircle').style.setProperty('--p', percent + '%');
+  document.getElementById('scoreSub').textContent = `${correct} / ${total} 题答对`;
+  document.getElementById('rating').textContent = rating(correct, total);
+
+  const list = document.getElementById('detailList');
+  list.innerHTML = '';
+  detail.forEach((d, i) => {
+    const div = document.createElement('div');
+    div.className = 'detail-item';
+    div.innerHTML =
+      `<div class="detail-q"><span class="q-no">${i+1}.</span><span class="q-text">${d.title}</span></div>` +
+      `<div class="detail-row"><span class="tag ${d.isCorrect?'tag-right':'tag-wrong'}">${d.isCorrect?'✓ 答对':'✗ 答错'}</span></div>` +
+      `<div class="answer-line">你的答案：${d.yourAnswer}</div>` +
+      `<div class="answer-line answer-correct">正确答案：${d.correctAnswer}</div>`;
+    list.appendChild(div);
+  });
+
+  show('result');
+}
+
+function rating(correct, total){
+  if (correct === total) return '满分！你就是这世上最懂我的人 🎉';
+  if (correct >= total*0.85) return '超懂我！咱俩的关系是铁磁/闺蜜/挚爱无疑 💜';
+  if (correct >= total*0.6) return '还不错，你基本了解我 😊';
+  if (correct >= total*0.4) return '嗯…你对我还不太熟，要加把劲哦';
+  return '你真的了解我吗？回去好好观察观察吧 😂';
+}
+</script>
+
+
+</body></html>
